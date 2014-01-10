@@ -1,0 +1,117 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/bg"
+    android:background="#333333"
+     >
+
+    <LinearLayout
+        android:id="@+id/warning_box"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        android:layout_gravity="bottom"
+         >
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="left"
+                android:adjustViewBounds="true"
+                android:src="@drawable/warning" />
+
+            <TextView
+                android:id="@+id/warning_label"
+                android:layout_width="287dp"
+                android:layout_height="fill_parent"
+                android:layout_gravity="left"
+                android:gravity="right"
+                android:password="false"
+                android:text="@string/not_default" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/button1"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/set_default_payment" />
+        </LinearLayout>
+    </LinearLayout>
+
+   
+
+    <LinearLayout
+		android:id="@+id/payment_control"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="bottom">
+
+            <CheckBox
+        android:id="@+id/automatic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/automatic_mode" />
+        
+             <Button
+                android:id="@+id/pay_now"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/pay_now" />
+
+    </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/servicename"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_column="1"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/servicedesc"
+            android:textColor="#13b515"
+            android:textSize="50sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_column="1"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical|center_horizontal"
+            android:text="@string/explanation"
+            android:textColor="#EEEEEE"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+</FrameLayout>

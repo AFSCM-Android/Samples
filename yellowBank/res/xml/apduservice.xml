@@ -1,0 +1,8 @@
+<offhost-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+           android:description="@string/servicedesc"
+           android:apduServiceBanner="@drawable/yellow_cash">
+    <aid-group android:description="@string/subscription" android:category="payment">
+ 		<aid-filter android:name="325041592E5359532E4444463031"/> <!--  PPSE -->
+ 		<aid-filter android:name="4E4643546573746572455654312E32"/> <!--  NFC Tester 2  -->
+    </aid-group>
+</offhost-apdu-service>

@@ -1,1 +1,18 @@
-This repository holds sample Android applications.
+This repository holds sample Android applications that show how tap&pay menu can be used by
+NFC payment applications.
+
+The folder consists in 
+- OffHostLib : code common to all applications
+- cityziBank : sample payment application #1
+- yellowBank : sample payment application #2
+- greenBank : sample payment application #3
+
+Each of the sample applications needs to be built against the OffHostLib. This sample code
+does not include : 
+- transaction management (capturing event transaction, this has long been documented now)
+- UICC acccess : APDUs to acccess cardlet is not built into these samples
+
+This code is meant to illustrate how to migrate payment applications from pre-KitKat version
+to Android 4.4 devices.
+
+

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Orange Sample</string>
+    <string name="activation">Enter your PIN</string>
+    <string name="dummy_content">Orange Payment Demo</string>
+    <string name="not_default">Orange is not currently set as your default payment application</string>
+    <string name="explanation">This sample app shows how to use Android APIs to created NFC payment applications</string>
+    
+    <string name="servicedesc">Orange</string>
+    <string name="enter_pin">Please enter PIN to activate</string>
+    <string name="subscription">Pay with your phone</string>
+    <string name="set_default_payment">set default payment</string>
+   	<string name="automatic_mode">Automatic payment below 20€</string>
+   	<string name="pay_now">Pay now</string>
+    
+</resources>
