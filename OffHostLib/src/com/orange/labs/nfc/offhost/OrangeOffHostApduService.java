@@ -1,8 +1,8 @@
 /*-------------------------------------------------------- 
- * Module Name : 
+ * Module Name : OffHostLib
  * Version : 
  * 
- * Software Name : Android NFC Handset Test Suite
+ * Software Name : Android Sample NFC applications
  * Version : VersionNumber
  *
  * Copyright (c) 2014 Orange
@@ -108,10 +108,12 @@ public class OrangeOffHostApduService extends OffHostApduService {
 					Util.myLog("Activated");
 
 					// TODO : read service status in UICC
-					// The following should only execute if the cardlet is not
-					// active already, and if payment mode is set to "automatic"
+					// If service is not enabled in the UICC, and if automatic mode
+					// then start PIN entry UI.
 					if (MainScreenActivity.automatic){
+						// if ( UICC_status_inactive )
 						ActivationActivity.kick(mContext);
+					    // }
 					}
 				}
 			} else {

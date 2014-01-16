@@ -1,8 +1,8 @@
 /*-------------------------------------------------------- 
- * Module Name : 
+ * Module Name : cityziBank
  * Version : 
  * 
- * Software Name : Android NFC Handset Test Suite
+ * Software Name : Android Sample NFC applications
  * Version : VersionNumber
  *
  * Copyright (c) 2014 Orange
