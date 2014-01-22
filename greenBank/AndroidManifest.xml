@@ -34,9 +34,7 @@
             android:theme="@style/AppBaseTheme" >
             <intent-filter>
                 <action android:name="com.gsma.services.nfc.action.TRANSACTION_EVENT" />
-                               <!--   com.gsma.services.nfc.action.TRANSACTION_EVENT -->
-				<data
-                    android:host="secure"
+		<data android:host="secure"
                     android:path="SIM1/4E4643546573746572455654312E31"
                     android:port="0"
                     android:scheme="nfc" />
@@ -45,15 +43,11 @@
        
         
     	<receiver android:exported="true"
-    	    android:name="com.orange.labs.nfc.offhost.AidReceiver">
-            <intent-filter>
-                <action android:name="com.android.nfc_extras.action.AID_SELECTED"/>
-                
-            </intent-filter>
+    	    android:name="com.orange.labs.nfc.offhost.EventReceiver">
     	       <intent-filter>
-                                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                                <category android:name="android.intent.category.HOME" />
-                        </intent-filter>
+                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                 <category android:name="android.intent.category.HOME" />
+               </intent-filter>
     	</receiver>    
     <service android:name=".greenCashService" android:exported="true"
          android:permission="android.permission.BIND_NFC_SERVICE">

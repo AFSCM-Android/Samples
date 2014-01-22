@@ -31,7 +31,7 @@ import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 
-public class AidReceiver extends BroadcastReceiver {
+public class EventReceiver extends BroadcastReceiver {
 	static int pushCount = 0;
 
 	/*
@@ -53,22 +53,7 @@ public class AidReceiver extends BroadcastReceiver {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 				OrangeOffHostApduService.bootcomplete = true;
 			}
-		} else {
-			/*
-			 * TODO : this section of code does not handle GSMA-style
-			 * transaction intents. Please do not consider as reference.
-			 * 
-			 * Transaction events intents are normally handled in an Activity
-			 * registered for them in the manifest.
-			 */
-			aid = bcast.getByteArrayExtra("com.android.nfc_extras.extra.AID");
-			textAid = bytesToHex(aid);
-			Util.myLog("Receiver AID " + textAid);
-			Intent intnt = new Intent();
-			intnt.setClass(ctxt, ActivationActivity.class);
-			intnt.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
-			ctxt.startActivity(intnt);
-		}
+		} 
 	}
 
 	/*
