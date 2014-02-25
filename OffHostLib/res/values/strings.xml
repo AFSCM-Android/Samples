@@ -5,7 +5,7 @@
     <string name="activation">Enter your PIN</string>
     <string name="dummy_content">Orange Payment Demo</string>
     <string name="not_default">Orange is not currently set as your default payment application</string>
-    <string name="explanation">This sample app shows how to use Android APIs to created NFC payment applications</string>
+    <string name="explanation">This sample app shows how to use Android APIs to create NFC payment applications</string>
     
     <string name="servicedesc">Orange</string>
     <string name="enter_pin">Please enter PIN to activate</string>
