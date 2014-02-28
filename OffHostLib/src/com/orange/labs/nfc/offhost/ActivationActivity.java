@@ -46,14 +46,9 @@ import android.widget.TextView.OnEditorActionListener;
  */
 
 public class ActivationActivity extends Activity {
-	public Context mContext;
-	
-	 static byte[] GET_STATUS_APDU = {(byte)0x80, (byte)0xF2, (byte)0x00, (byte)0x00, (byte)0x00 };
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mContext = this;
 		setContentView(R.layout.activity_activation);
 		
 		TextView label = (TextView)findViewById(R.id.enter_pin_label);
