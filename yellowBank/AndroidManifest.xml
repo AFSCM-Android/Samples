@@ -4,10 +4,12 @@
     android:versionCode="10"
     android:versionName="10.0" >
 
-   <uses-permission android:name="android.permission.NFC" />
-	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
-	
-   <uses-sdk
+    <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="com.gsma.services.nfc.permission.TRANSACTION_EVENT" />
+    <uses-permission android:name="org.simalliance.openmobileapi.SMARTCARD" />
+
+    <uses-sdk
         android:minSdkVersion="15"
         android:targetSdkVersion="19" />
 
@@ -16,6 +18,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <uses-library
+            android:name="org.simalliance.openmobileapi"
+            android:required="true" />
+
         <activity
             android:name=".yellowCashUI"
             android:configChanges="orientation|keyboardHidden|screenSize"
@@ -27,7 +33,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
         <activity
             android:name="com.orange.labs.nfc.offhost.ActivationActivity"
             android:configChanges="orientation|screenSize"
@@ -37,34 +42,36 @@
             android:theme="@style/AppBaseTheme" >
             <intent-filter>
                 <action android:name="com.gsma.services.nfc.action.TRANSACTION_EVENT" />
-				<data
+                <data
                     android:host="secure"
                     android:pathPattern="*/4E464354657374657245545349312E30"
                     android:port="0"
                     android:scheme="nfc" />
             </intent-filter>
         </activity>
-        
+
         <receiver
             android:name="com.orange.labs.nfc.offhost.EventReceiver"
             android:exported="true" >
-    	       <intent-filter>
-                                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                                <category android:name="android.intent.category.HOME" />
-                        </intent-filter>
-    	</receiver>    
-        
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+
+                <category android:name="android.intent.category.HOME" />
+            </intent-filter>
+        </receiver>
+
         <service
             android:name=".yellowCashService"
             android:exported="true"
-         android:permission="android.permission.BIND_NFC_SERVICE">
-    	 <intent-filter>
-       	 	<action android:name="android.nfc.cardemulation.action.OFF_HOST_APDU_SERVICE"/>
-  	  </intent-filter>
+            android:permission="android.permission.BIND_NFC_SERVICE" >
+            <intent-filter>
+                <action android:name="android.nfc.cardemulation.action.OFF_HOST_APDU_SERVICE" />
+            </intent-filter>
+
             <meta-data
                 android:name="android.nfc.cardemulation.off_host_apdu_service"
-               android:resource="@xml/apduservice"/>
-    </service>
+                android:resource="@xml/apduservice" />
+        </service>
     </application>
 
 </manifest>

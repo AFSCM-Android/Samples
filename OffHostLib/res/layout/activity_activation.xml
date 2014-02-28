@@ -16,8 +16,8 @@
             android:layout_gravity="center_horizontal"
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/enter_pin"
-             android:textColor="#13b515"
-        	android:textSize="50sp"
+            android:textColor="#13b515"
+            android:textSize="50sp"
             android:textStyle="bold" />
 
         <EditText

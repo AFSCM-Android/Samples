@@ -33,7 +33,6 @@ import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -44,7 +43,9 @@ public abstract class MainScreenActivity extends Activity {
 	public static View payNowButton = null;
 	public static String serviceName = "";
 	public static int color = 0;
-
+	protected static byte[] AID = null;
+	public UICC mUICC;
+	
 	/*
 	 * Hook to link to associated service. This allows to perfome default
 	 * payment query and provide UI accordingly. To be implemented by
@@ -162,6 +163,8 @@ public abstract class MainScreenActivity extends Activity {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			OrangeOffHostApduService.bootcomplete = true;
 		}
+		
+		mUICC = new UICC( this );
 	}
 
 	/*
@@ -198,4 +201,16 @@ public abstract class MainScreenActivity extends Activity {
 		title.setText(sn);
 	}
 
+	/* Simple function to set target AID */
+	public void setAID(byte[] aid_array) {
+		AID = aid_array;
+	}
+	
+	@Override
+	protected void onDestroy() {
+		if (mUICC != null) {
+			mUICC.dispose();
+		}
+		super.onDestroy();
+	}
 }
