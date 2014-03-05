@@ -20,7 +20,7 @@
         android:theme="@style/AppTheme" >
         <uses-library
             android:name="org.simalliance.openmobileapi"
-            android:required="true" />
+            android:required="false" />
         <activity
             android:name=".cityziPayUI"
             android:configChanges="orientation|keyboardHidden|screenSize"

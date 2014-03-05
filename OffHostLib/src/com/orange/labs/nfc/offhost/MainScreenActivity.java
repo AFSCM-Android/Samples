@@ -163,8 +163,21 @@ public abstract class MainScreenActivity extends Activity {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			OrangeOffHostApduService.bootcomplete = true;
 		}
-		
-		mUICC = new UICC( this );
+	
+		try {
+		    Class classToInvestigate = Class.forName("org.simalliance.openmobileapi.Reader"); 
+
+			mUICC = new UICC( this );
+		    // Dynamically do stuff with this class
+		    // List constructors, fields, methods, etc.
+
+		} catch (ClassNotFoundException e) {
+		    // Class not found!
+			Util.myLog("UICC access not supported on this device" + e );
+		} catch (Exception e) {
+		    // Unknown exception
+			Util.myLog("Unknown error " + e );
+		}
 	}
 
 	/*

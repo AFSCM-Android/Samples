@@ -101,8 +101,16 @@ public class ActivationActivity extends Activity {
 		    }
 		});
 
-
-		mUICC = new UICC(this);
+		try {
+		    Class classToInvestigate = Class.forName("org.simalliance.openmobileapi.Reader"); 
+		    mUICC = new UICC(this);
+		} catch (ClassNotFoundException e) {
+		    // Class not found!
+			Util.myLog("UICC access not supported on this device" + e );
+		} catch (Exception e) {
+		    // Unknown exception
+			Util.myLog("Unknown error " + e );
+		}
 	}
 	
 	void makeToast(String message){
