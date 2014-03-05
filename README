@@ -17,7 +17,7 @@ each application.
 
 This sample code does not cover : 
 - transaction management (capturing event transaction, this has long been documented now)
-- UICC acccess : APDUs to acccess cardlet is not built into these samples
+- UICC acccess : APDUs to acccess cardlet is not fully built into these samples
 
 This code is meant to illustrate how to migrate payment applications from 
 pre-KitKat version to Android 4.4 devices.
