@@ -42,9 +42,10 @@
             android:theme="@style/AppBaseTheme" >
             <intent-filter>
                 <action android:name="com.gsma.services.nfc.action.TRANSACTION_EVENT" />
+                <category android:name="android.intent.category.DEFAULT" />
                 <data
                     android:host="secure"
-                    android:pathPattern="/SIM.*/4E464354657374657245545349312E30"
+                    android:pathPattern="/SIM.*/4e464354657374657245545349312e30"
                     android:port="0"
                     android:scheme="nfc" />
             </intent-filter>
