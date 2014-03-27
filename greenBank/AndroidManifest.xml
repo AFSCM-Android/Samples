@@ -43,11 +43,11 @@
             <intent-filter>
                 <action android:name="com.gsma.services.nfc.action.TRANSACTION_EVENT" />
 
-                <category android:name="android.intent.category.DEFAULT" /
+                <category android:name="android.intent.category.DEFAULT" />
+
                 <data
                     android:host="secure"
                     android:pathPattern="/SIM.*/4e464354657374657245545349312e32"
-                    android:port="0"
                     android:scheme="nfc" />
             </intent-filter>
         </activity>
