@@ -5,6 +5,26 @@
     android:background="#333333"
     tools:context="com.orange.labs.nfc.offhost.ActivationActivity" >
 
+    <TextView
+            android:id="@+id/confirmation"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:gravity="center"   
+            android:text=""
+            android:textColor="#13b515"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/confirmation_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal|bottom"
+        android:textAlignment="center"
+        android:text="@string/ok"
+        android:visibility="invisible"  />
+    
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
@@ -17,7 +37,7 @@
             android:gravity="center_vertical|center_horizontal"
             android:text="@string/enter_pin"
             android:textColor="#13b515"
-            android:textSize="50sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <EditText
@@ -30,6 +50,7 @@
             android:imeOptions="actionDone" 
             android:inputType="numberPassword" >
         </EditText>
+
     </RelativeLayout>
 
 </FrameLayout>
