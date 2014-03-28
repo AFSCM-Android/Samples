@@ -27,13 +27,18 @@ package com.orange.labs.nfc.offhost;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -46,6 +51,15 @@ public abstract class MainScreenActivity extends Activity {
 	public static int color = 0;
 	protected static byte[] AID = null;
 	public UICC mUICC;
+	
+	private Handler uiHandler = new UIHandler();
+
+	class UIHandler extends Handler {
+	    @Override
+	    public void handleMessage(Message msg) {
+	        refreshUI();
+	    }
+	}
 
 	/*
 	 * Hook to link to associated service. This allows to perfome default
@@ -170,12 +184,19 @@ public abstract class MainScreenActivity extends Activity {
 			OrangeOffHostApduService.bootcomplete = true;
 		}
 
+		/*
+		 * UICC management : create a UICC object, and lauch a thread to read
+		 * current cardlet activation status.
+		 */
+		
+		
+
 		try {
 			Class classToInvestigate = Class
 					.forName("org.simalliance.openmobileapi.Reader");
 
 			mUICC = new UICC(this);
-			(new GetStatusTask()).start();
+			(new GetStatusTask(this)).start();
 
 		} catch (ClassNotFoundException e) {
 			// Class not found!
@@ -187,9 +208,19 @@ public abstract class MainScreenActivity extends Activity {
 	}
 
 	private class GetStatusTask extends Thread {
+		MainScreenActivity mA;
+		public GetStatusTask(MainScreenActivity a){
+			super();
+			mA = a;
+		}
 		@Override
 		public void run() {
-			automatic = mUICC.isActive(AID);
+			mA.automatic = mA.mUICC.isActive(AID);
+			
+			// Notify UI thread for update
+			Message msg = Message.obtain(uiHandler);
+            msg.obj = "update";
+            uiHandler.sendMessage(msg);
 		}
 	}
 
@@ -200,6 +231,11 @@ public abstract class MainScreenActivity extends Activity {
 	 */
 	protected void onResume() {
 		super.onResume();
+		
+		refreshUI();
+	}
+	
+	void refreshUI(){
 
 		View mLL = findViewById(R.id.warning_box);
 		View pC = findViewById(R.id.payment_control);

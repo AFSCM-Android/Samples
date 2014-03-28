@@ -61,6 +61,8 @@ public class UICC implements CallBack {
 
 					if (isConnected) {
 
+						mLock.unlock();
+						
 						// TODO : look for UICC in the reader list
 						uicc = (scardManager.getReaders())[0];
 						Util.myLog("Connected to " + uicc.getName());
