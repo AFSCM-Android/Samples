@@ -31,6 +31,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -124,7 +125,8 @@ public abstract class MainScreenActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				setDefaultPaymentSetting();
-				ActivationActivity.kick(mContext, ActivationActivity.TODO_PAY_NOW);
+				ActivationActivity.kick(mContext,
+						ActivationActivity.TODO_PAY_NOW);
 			}
 		});
 
@@ -136,14 +138,22 @@ public abstract class MainScreenActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				CheckBox cb = (CheckBox) view;
-				Util.myLog("Automatic " + (cb.isChecked()?"checked":"unchecked"));
+				Util.myLog("Automatic "
+						+ (cb.isChecked() ? "checked" : "unchecked"));
 
 				if (cb.isChecked()) {
 					/*
 					 * start PIN entry screen. If PIN matches then activate UICC
 					 * payment instance.
 					 */
-					ActivationActivity.kick(mContext, ActivationActivity.TODO_ACTIVATE);
+					ActivationActivity.kick(mContext,
+							ActivationActivity.TODO_ACTIVATE);
+				} else {
+					try {
+						mUICC.deActivate(MainScreenActivity.AID);
+					} catch (Exception e) {
+						Util.myLog("Error trying to deactivate : " + e);
+					}
 				}
 				if (payNowButton != null) {
 					payNowButton.setVisibility((cb.isChecked() ? View.INVISIBLE
@@ -165,8 +175,7 @@ public abstract class MainScreenActivity extends Activity {
 					.forName("org.simalliance.openmobileapi.Reader");
 
 			mUICC = new UICC(this);
-			// Dynamically do stuff with this class
-			// List constructors, fields, methods, etc.
+			new GetStatusTask().execute(this);
 
 		} catch (ClassNotFoundException e) {
 			// Class not found!
@@ -174,6 +183,13 @@ public abstract class MainScreenActivity extends Activity {
 		} catch (Exception e) {
 			// Unknown exception
 			Util.myLog("Unknown error " + e);
+		}
+	}
+
+	class GetStatusTask extends AsyncTask<MainScreenActivity, Integer, Long> {
+		protected Long doInBackground(MainScreenActivity... a) {
+			a[0].automatic = a[0].mUICC.isActive(AID);
+			return null;
 		}
 	}
 
@@ -198,7 +214,7 @@ public abstract class MainScreenActivity extends Activity {
 
 		CheckBox cb = (CheckBox) findViewById(R.id.automatic);
 		cb.setChecked(automatic);
-		
+
 		if (payNowButton != null) {
 			payNowButton.setVisibility((cb.isChecked() ? View.INVISIBLE
 					: View.VISIBLE));

@@ -42,8 +42,8 @@ public class greenCashUI extends MainScreenActivity {
 	@Override
 	public void onCreate(Bundle b) {
 		Util.setTag("GreenCash");
+		setAID(mAID);
 		super.onCreate(b);
 		setServiceName("Green Cash", 0xEF44BB22);
-		setAID(mAID);
 	}
 }

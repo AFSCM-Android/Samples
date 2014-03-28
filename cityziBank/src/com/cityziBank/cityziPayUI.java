@@ -41,9 +41,9 @@ public class cityziPayUI extends MainScreenActivity {
 	@Override
 	public void onCreate(Bundle b) {
 		Util.setTag("CityziPay");
-		// TODO Auto-generated method stub
-		super.onCreate(b);
-		setServiceName("Cityzi Pay", 0xEF999999);
         setAID(mAID);
+        super.onCreate(b);
+		setServiceName("Cityzi Pay", 0xEF999999);
+
 	}
 }

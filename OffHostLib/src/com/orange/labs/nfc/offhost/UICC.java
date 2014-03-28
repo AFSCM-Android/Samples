@@ -2,6 +2,8 @@ package com.orange.labs.nfc.offhost;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.simalliance.openmobileapi.Channel;
 import org.simalliance.openmobileapi.Reader;
@@ -24,13 +26,20 @@ public class UICC implements CallBack {
 			(byte) 0x00 };
 	byte[] deactivate_APDU = new byte[] { (byte) 0x80, (byte) 0xf0,
 			(byte) 0x00, (byte) 0x00 };
+	byte[] get_status_APDU = new byte[] { (byte) 0x80, (byte) 0xf2,
+			(byte) 0x00, (byte) 0x00, (byte) 0x00 };
 
 	public SEService scardManager;
-	private boolean isConnected = false;
+	private Lock mLock = new ReentrantLock();
+	public volatile boolean isConnected = false;
 
 	public UICC(Context ctx) {
 		try {
-			scardManager = new SEService(ctx, this);
+			synchronized (mLock) {
+				Util.myLog("lock");
+				mLock.lock();
+				scardManager = new SEService(ctx, this);
+			}
 		} catch (SecurityException e) {
 			Util.myLog("Smartcard binding not allowed");
 		} catch (Exception e) {
@@ -46,52 +55,63 @@ public class UICC implements CallBack {
 		Channel c = null;
 		byte[] ret = null;
 
-		if (isConnected) {
+		Util.myLog("before sync");
+		synchronized (mLock) {
+			// try {
+			mLock.tryLock();
+			Util.myLog("after sync");
 
-			// TODO : look for UICC in the reader list
-			uicc = (scardManager.getReaders())[0];
-			Util.myLog("Connected to " + uicc.getName());
+			if (isConnected) {
 
-			if (uicc.isSecureElementPresent() == false) {
-				throw new cardNotPresentException();
-			}
+				// TODO : look for UICC in the reader list
+				uicc = (scardManager.getReaders())[0];
+				Util.myLog("Connected to " + uicc.getName());
 
-			try {
-				s = uicc.openSession();
-				Util.myLog("[AID] " + Util.bytesToHex(aid));
+				if (uicc.isSecureElementPresent() == false) {
+					throw new cardNotPresentException();
+				}
 
 				try {
-					c = s.openLogicalChannel(aid);
-					Util.myLog("[SELECT] OK");
-					Util.myLog("APDU : " + Util.bytesToHex(capdu));
+					s = uicc.openSession();
+					Util.myLog("[AID] " + Util.bytesToHex(aid));
 
-					ret = c.transmit(capdu);
-					Util.myLog("<= " + Util.bytesToHex(ret));
+					try {
+						c = s.openLogicalChannel(aid);
+						Util.myLog("[SELECT] OK");
+						Util.myLog("APDU : " + Util.bytesToHex(capdu));
 
-				} catch (SecurityException e1) {
-					throw new accessDeniedException();
-				} catch (NoSuchElementException e) {
-					throw e;
-				} catch (Exception e1) {
-					Util.myLog("[" + e1.getClass().getName() + "]\n\t"
-							+ e1.getMessage());
+						ret = c.transmit(capdu);
+						Util.myLog("<= " + Util.bytesToHex(ret));
+
+					} catch (SecurityException e1) {
+						throw new accessDeniedException();
+					} catch (NoSuchElementException e) {
+						throw e;
+					} catch (Exception e1) {
+						Util.myLog("[" + e1.getClass().getName() + "]\n\t"
+								+ e1.getMessage());
+					} finally {
+						if (c != null) {
+							Util.myLog("Closing channel");
+							c.close();
+						}
+					}
+				} catch (IOException e2) {
+					Util.myLog("[SESSION] KO \n" + e2.getClass().getName()
+							+ "]\n\t" + e2.getMessage());
 				} finally {
-					if (c != null) {
-						Util.myLog("Closing channel");
-						c.close();
+					if (s != null) {
+						Util.myLog("Closing session");
+						s.close();
 					}
 				}
-			} catch (IOException e2) {
-				Util.myLog("[SESSION] KO \n" + e2.getClass().getName()
-						+ "]\n\t" + e2.getMessage());
-			} finally {
-				if (s != null) {
-					Util.myLog("Closing session");
-					s.close();
-				}
+			} else {
+				Util.myLog("Service not connected");
 			}
-		} else {
-			Util.myLog("Service not connected");
+
+			// } catch (InterruptedException e) {
+			// Util.myLog("Interrupted !");
+			// }
 		}
 
 		return ret;
@@ -100,10 +120,14 @@ public class UICC implements CallBack {
 	/* Function callback to handle SE Service connection */
 	@Override
 	public void serviceConnected(SEService service) {
+		Util.myLog("serviceConnected");
+
 		scardManager = service;
 		try {
 			if (service.isConnected()) {
 				isConnected = true;
+				Util.myLog("unlock");
+				mLock.unlock();
 				Reader[] scardReaders = scardManager.getReaders();
 				if (scardReaders != null) {
 					Util.myLog("Identified readers:");
@@ -113,6 +137,7 @@ public class UICC implements CallBack {
 								+ (reader.isSecureElementPresent() ? "present"
 										: "absent"));
 					}
+
 				} else
 					Util.myLog("No reader detected");
 			}
@@ -133,6 +158,7 @@ public class UICC implements CallBack {
 		byte[] tmpPIN = verifyPIN_APDU;
 		System.arraycopy(pinValue.getBytes(), 0, tmpPIN, 5,
 				pinValue.getBytes().length);
+
 		byte[] rapdu = sendAPDU(aid, tmpPIN, "Verify PIN");
 		if (rapdu[0] != (byte) 0x90 || rapdu[1] != (byte) 0) {
 			throw new WrongPinException();
@@ -144,7 +170,26 @@ public class UICC implements CallBack {
 			throws cardNotPresentException, accessDeniedException,
 			NoSuchElementException, WrongPinException {
 		verifyPIN(aid, pinValue);
-
 		return sendAPDU(aid, activate_APDU, "Activate");
+	}
+
+	public byte[] deActivate(byte[] aid) throws cardNotPresentException,
+			accessDeniedException, NoSuchElementException, WrongPinException {
+		return sendAPDU(aid, deactivate_APDU, "Deactivate");
+	}
+
+	public boolean isActive(byte[] aid) {
+		byte[] response;
+
+		try {
+			response = sendAPDU(aid, get_status_APDU, "Get Status");
+			if (response[0] == (byte) 0x01 && response[1] == (byte) 0x90
+					&& response[2] == (byte) 0x00) {
+				return true;
+			}
+		} catch (Exception e) {
+			Util.myLog("Exception ! " + e);
+		}
+		return false;
 	}
 }

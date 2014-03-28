@@ -40,8 +40,8 @@ public class yellowCashUI extends MainScreenActivity {
 	@Override
 	public void onCreate(Bundle b) {
 		Util.setTag("YellowCash");
+		setAID(mAID);
 		super.onCreate(b);
 		setServiceName("Yellow Cash", 0xEFEEDD22);
-		setAID(mAID);
 	}
 }
