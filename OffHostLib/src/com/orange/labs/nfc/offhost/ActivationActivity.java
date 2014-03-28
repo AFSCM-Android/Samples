@@ -120,14 +120,19 @@ public class ActivationActivity extends Activity {
 								response = mUICC.verifyPIN(
 										MainScreenActivity.AID, v.getText()
 												.toString());
+								makeToast("Tap again");
 								break;
 							case TODO_ACTIVATE:
 								response = mUICC.activate(
 										MainScreenActivity.AID, v.getText()
 												.toString());
+								
+								if ( response[0] == (byte)0x90 && response[1]==(byte)0 ){
+									makeToast("Activated");
+								}
 								break;
 							}
-							makeToast("Tap again");
+							
 						} catch (WrongPinException e) {
 							makeToast("Wrong PIN");
 						} catch (accessDeniedException e) {

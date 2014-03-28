@@ -45,7 +45,7 @@ public abstract class MainScreenActivity extends Activity {
 	public static int color = 0;
 	protected static byte[] AID = null;
 	public UICC mUICC;
-	
+
 	/*
 	 * Hook to link to associated service. This allows to perfome default
 	 * payment query and provide UI accordingly. To be implemented by
@@ -69,8 +69,8 @@ public abstract class MainScreenActivity extends Activity {
 			return (ce.isDefaultServiceForCategory(new ComponentName(mContext,
 					getAssociatedService()), "payment"));
 		}
-		
-		return true;   // Assume we are routed on pre-kitkat releases.
+
+		return true; // Assume we are routed on pre-kitkat releases.
 	}
 
 	/*
@@ -155,28 +155,28 @@ public abstract class MainScreenActivity extends Activity {
 			}
 		});
 
-		/* 
-		 * Some code here is written in order to ignore notification 
-		 * of tap&pay change received at every boot by the currently 
-		 * selected application.
+		/*
+		 * Some code here is written in order to ignore notification of tap&pay
+		 * change received at every boot by the currently selected application.
 		 */
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			OrangeOffHostApduService.bootcomplete = true;
 		}
-	
-		try {
-		    Class classToInvestigate = Class.forName("org.simalliance.openmobileapi.Reader"); 
 
-			mUICC = new UICC( this );
-		    // Dynamically do stuff with this class
-		    // List constructors, fields, methods, etc.
+		try {
+			Class classToInvestigate = Class
+					.forName("org.simalliance.openmobileapi.Reader");
+
+			mUICC = new UICC(this);
+			// Dynamically do stuff with this class
+			// List constructors, fields, methods, etc.
 
 		} catch (ClassNotFoundException e) {
-		    // Class not found!
-			Util.myLog("UICC access not supported on this device" + e );
+			// Class not found!
+			Util.myLog("UICC access not supported on this device" + e);
 		} catch (Exception e) {
-		    // Unknown exception
-			Util.myLog("Unknown error " + e );
+			// Unknown exception
+			Util.myLog("Unknown error " + e);
 		}
 	}
 
@@ -199,6 +199,9 @@ public abstract class MainScreenActivity extends Activity {
 			pC.setVisibility(View.VISIBLE);
 		}
 
+		CheckBox cb = (CheckBox) findViewById(R.id.automatic);
+		cb.setChecked(automatic);
+
 		TextView wl = (TextView) findViewById(R.id.warning_label);
 		// TODO : use resource text string instead
 		wl.setText(serviceName
@@ -218,7 +221,7 @@ public abstract class MainScreenActivity extends Activity {
 	public void setAID(byte[] aid_array) {
 		AID = aid_array;
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		if (mUICC != null) {
