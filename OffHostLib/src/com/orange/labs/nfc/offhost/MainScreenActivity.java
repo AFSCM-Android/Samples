@@ -39,6 +39,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Vibrator;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;

@@ -37,7 +37,7 @@
             android:name="com.orange.labs.nfc.offhost.ActivationActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask" 
             android:theme="@style/AppBaseTheme"
             android:windowSoftInputMode="stateUnspecified" >
             <intent-filter>

@@ -37,6 +37,8 @@ import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -45,6 +47,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -70,39 +73,78 @@ public class ActivationActivity extends Activity {
 	static final int TODO_VERIFY = 2;
 	static final int TODO_CONFIRM = 3;
 	static final int TODO_PAY_NOW = 4;
-	
+
+	static final String COUNTDOWN = "countdown";
+
 	static final String PURPOSE_EXTRA = "whatfor";
+
+	UIHandler uiHandler = new UIHandler();
 
 	/*
 	 * Assuming activation request by default. This happens to match the default
 	 * layout values
 	 */
 	private int todo = TODO_ACTIVATE;
+	static private CountDownThread cdt = null;
+
+	class UIHandler extends Handler {
+		@Override
+		public void handleMessage(Message msg) {
+			if (msg.getData().getInt(COUNTDOWN) > 0) {
+				TextView tv = (TextView) findViewById(R.id.seconds);
+				tv.setText(msg.getData().getInt(COUNTDOWN)
+						+ " seconds remaining");
+			} else {
+				if (todo == TODO_PAY_NOW) {
+					try {
+						mUICC.deActivate(MainScreenActivity.AID);
+						finish();
+					} catch (Exception e) {
+						Util.myLog("Deactivation failed for some reason");
+					}
+				}
+			}
+		}
+	}
+
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+
+		checkNfcPush(intent);
+
+		if (todo == TODO_PAY_NOW) {
+			findViewById(R.id.countdown).setVisibility(View.INVISIBLE);
+
+			if (cdt != null) {
+				cdt.interrupt();
+				cdt = null;
+			}
+			
+			try {
+				mUICC.deActivate(MainScreenActivity.AID);
+			} catch (Exception e){
+				Util.myLog("Deactivation failed for some reason.");
+			}
+		}
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		setContentView(R.layout.activity_activation);
-		
-		todo = getIntent().getIntExtra(PURPOSE_EXTRA, TODO_ACTIVATE );
+
+		todo = getIntent().getIntExtra(PURPOSE_EXTRA, TODO_ACTIVATE);
 
 		TextView label = (TextView) findViewById(R.id.enter_pin_label);
 		label.setTextColor(MainScreenActivity.color);
 
-		String nfcaction = this.getIntent().getAction();
+		label = (TextView) findViewById(R.id.please_tap_label);
+		label.setTextColor(MainScreenActivity.color);
 
-		// Handle legacy intent as well as GSMA standard type intent
-		if (nfcaction != null) {
-			if (nfcaction.equals(PaymentConstants.TRANSACTION_EVENT_LEGACY)) {
-				updateUI(this.getIntent().getByteArrayExtra(
-						PaymentConstants.TRANSACTION_EVENT_EXTRA_DATA_LEGACY));
-			} else if (nfcaction
-					.equals(PaymentConstants.TRANSACTION_EVENT_GSMA)) {
-				updateUI(this.getIntent().getByteArrayExtra(
-						PaymentConstants.TRANSACTION_EVENT_EXTRA_DATA_GSMA));
-			}
-		}
+		
+		checkNfcPush(getIntent());
 
 		EditText pinEntry = (EditText) findViewById(R.id.PIN_entry);
 		pinEntry.setOnEditorActionListener(new OnEditorActionListener() {
@@ -111,6 +153,10 @@ public class ActivationActivity extends Activity {
 					KeyEvent event) {
 				boolean handled = false;
 				if (actionId == EditorInfo.IME_ACTION_DONE) {
+					// remove keyboard
+					InputMethodManager inputManager = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+					inputManager.hideSoftInputFromWindow(v.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+
 					// TODO : do not leave this in production code !
 					Util.myLog("PIN : " + v.getText());
 
@@ -123,23 +169,41 @@ public class ActivationActivity extends Activity {
 								response = mUICC.verifyPIN(
 										MainScreenActivity.AID, v.getText()
 												.toString());
-								makeToast("Tap again");
+								// Assuming PIN is correct from here (otherwise
+								// exception)
+								startCountDown();
 								break;
 							case TODO_ACTIVATE:
-								MainScreenActivity.automatic=false;
+								MainScreenActivity.automatic = false;
 								response = mUICC.activate(
 										MainScreenActivity.AID, v.getText()
 												.toString());
-								
-								if ( response[0] == (byte)0x90 && response[1]==(byte)0 ){
+
+								if (response[0] == (byte) 0x90
+										&& response[1] == (byte) 0) {
 									makeToast("Activated");
-									MainScreenActivity.automatic=true;
-								}else{
+									MainScreenActivity.automatic = true;
+								} else {
 									makeToast("Activation failed");
 								}
 								break;
+							case TODO_PAY_NOW:
+								response = mUICC.activate(
+										MainScreenActivity.AID, v.getText()
+												.toString());
+
+								if ( ( response[0] == (byte) 0x90
+										&& response[1] == (byte) 0) 
+										||  ( response[0] == (byte) 0x69
+												&& response[1] == (byte)0x85) ) {
+									startCountDown();
+								} else {
+									makeToast("Activation failed");
+								}
+								startCountDown();
+								break;
 							}
-							
+
 						} catch (WrongPinException e) {
 							makeToast("Wrong PIN");
 						} catch (accessDeniedException e) {
@@ -151,7 +215,8 @@ public class ActivationActivity extends Activity {
 						}
 					}
 					handled = true;
-					finish();
+					if (todo != TODO_PAY_NOW)
+						finish();
 				}
 				return handled;
 			}
@@ -170,14 +235,63 @@ public class ActivationActivity extends Activity {
 		}
 	}
 
+	protected void startCountDown() {
+		findViewById(R.id.enter_pin_label).setVisibility(View.INVISIBLE);
+		findViewById(R.id.PIN_entry).setVisibility(View.INVISIBLE);
+		findViewById(R.id.countdown).setVisibility(View.VISIBLE);
+
+		cdt = new CountDownThread();
+		cdt.start();
+	}
+
+	class CountDownThread extends Thread {
+		public void run() {
+			int i = 30;
+			while (i >= 0) {
+				try {
+					sleep(1000);
+					Message msg = Message.obtain(uiHandler);
+					Bundle b = new Bundle();
+					b.putInt(COUNTDOWN, i);
+					msg.setData(b);
+					uiHandler.sendMessage(msg);
+				} catch (InterruptedException e) {
+					return;
+				}
+				i--;
+			}
+		}
+	}
+
+	void checkNfcPush(Intent i) {
+		String nfcaction = i.getAction();
+
+		// Handle legacy intent as well as GSMA standard type intent
+		if (nfcaction != null) {
+			if (nfcaction.equals(PaymentConstants.TRANSACTION_EVENT_LEGACY)) {
+				updateUI(i
+						.getByteArrayExtra(PaymentConstants.TRANSACTION_EVENT_EXTRA_DATA_LEGACY));
+			} else if (nfcaction
+					.equals(PaymentConstants.TRANSACTION_EVENT_GSMA)) {
+				updateUI(i
+						.getByteArrayExtra(PaymentConstants.TRANSACTION_EVENT_EXTRA_DATA_GSMA));
+			}
+		}
+	}
+
 	private void updateUI(byte[] payload) {
-		if (payload.length == 2) {
+		if (todo == TODO_PAY_NOW || payload.length == 2) {
 			// push is caused by second TAP
 			todo = TODO_CONFIRM;
 
 			// Remove PIN entry stuff
 			findViewById(R.id.PIN_entry).setVisibility(View.INVISIBLE);
 			findViewById(R.id.enter_pin_label).setVisibility(View.INVISIBLE);
+
+			// Remove countdown
+			findViewById(R.id.countdown).setVisibility(View.INVISIBLE);
+			findViewById(R.id.seconds).setVisibility(View.INVISIBLE);
+			findViewById(R.id.please_tap_label).setVisibility(View.INVISIBLE);
 
 			// Show confirmation message and exit button
 			findViewById(R.id.confirmation_button).setVisibility(View.VISIBLE);
@@ -194,6 +308,7 @@ public class ActivationActivity extends Activity {
 
 			if (payload[1] == 1) {
 				// Successfull payment
+				tv.setTextColor(Color.GREEN);
 				tv.setText("Payment authorised");
 			} else {
 				tv.setTextColor(Color.RED);
@@ -239,7 +354,7 @@ public class ActivationActivity extends Activity {
 		intnt.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
 		ctx.startActivity(intnt);
 	}
-	
+
 	static void kick(Context ctx) {
 		kick(ctx, TODO_ACTIVATE);
 	}

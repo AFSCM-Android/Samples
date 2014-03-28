@@ -14,6 +14,8 @@
    	<string name="automatic_mode">Automatic payment below 20€</string>
    	<string name="pay_now">Pay now</string>
    	<string name="ok">OK</string>
+   	
+   	<string name="please_tap">Please tap your phone to the payment terminal</string>
     
    	
  

@@ -5,6 +5,36 @@
     android:background="#333333"
     tools:context="com.orange.labs.nfc.offhost.ActivationActivity" >
 
+    <LinearLayout
+        android:id="@+id/countdown"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+    	<TextView
+    	    android:id="@+id/please_tap_label"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"   
+            android:text="@string/please_tap"
+            android:textColor="#13b515"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+    	
+    	<TextView
+    	    android:id="@+id/seconds"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"   
+            android:text="30 seconds remaining"
+            android:textColor="#AAAAAA"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+    	
+    
+    </LinearLayout>
+
     <TextView
             android:id="@+id/confirmation"
             android:layout_width="fill_parent"
@@ -24,6 +54,7 @@
         android:textAlignment="center"
         android:text="@string/ok"
         android:visibility="invisible"  />
+
     
     <RelativeLayout
         android:layout_width="match_parent"
