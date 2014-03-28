@@ -174,7 +174,7 @@ public class UICC implements CallBack {
 	}
 
 	public byte[] deActivate(byte[] aid) throws cardNotPresentException,
-			accessDeniedException, NoSuchElementException, WrongPinException {
+			accessDeniedException, NoSuchElementException {
 		return sendAPDU(aid, deactivate_APDU, "Deactivate");
 	}
 

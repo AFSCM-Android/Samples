@@ -163,11 +163,7 @@ public abstract class MainScreenActivity extends Activity {
 					ActivationActivity.kick(mContext,
 							ActivationActivity.TODO_ACTIVATE);
 				} else {
-					try {
-						mUICC.deActivate(MainScreenActivity.AID);
-					} catch (Exception e) {
-						Util.myLog("Error trying to deactivate : " + e);
-					}
+					(new deactivateTask()).start();
 				}
 				if (payNowButton != null) {
 					payNowButton.setVisibility((cb.isChecked() ? View.INVISIBLE
@@ -196,7 +192,7 @@ public abstract class MainScreenActivity extends Activity {
 					.forName("org.simalliance.openmobileapi.Reader");
 
 			mUICC = new UICC(this);
-			(new GetStatusTask(this)).start();
+			(new GetStatusTask()).start();
 
 		} catch (ClassNotFoundException e) {
 			// Class not found!
@@ -208,14 +204,27 @@ public abstract class MainScreenActivity extends Activity {
 	}
 
 	private class GetStatusTask extends Thread {
-		MainScreenActivity mA;
-		public GetStatusTask(MainScreenActivity a){
-			super();
-			mA = a;
-		}
 		@Override
 		public void run() {
-			mA.automatic = mA.mUICC.isActive(AID);
+			automatic = mUICC.isActive(AID);
+			
+			// Notify UI thread for update
+			Message msg = Message.obtain(uiHandler);
+            msg.obj = "update";
+            uiHandler.sendMessage(msg);
+		}
+	}
+	
+	private class deactivateTask extends Thread {
+		@Override
+		public void run() {
+			
+			try {
+				mUICC.deActivate(AID);
+				automatic = false;
+				} catch (Exception e) {
+				Util.myLog("Error trying to deactivate : " + e);
+			}
 			
 			// Notify UI thread for update
 			Message msg = Message.obtain(uiHandler);
