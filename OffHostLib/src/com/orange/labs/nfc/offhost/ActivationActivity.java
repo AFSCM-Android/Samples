@@ -69,6 +69,9 @@ public class ActivationActivity extends Activity {
 	static final int TODO_DEACTIVATE = 1;
 	static final int TODO_VERIFY = 2;
 	static final int TODO_CONFIRM = 3;
+	static final int TODO_PAY_NOW = 4;
+	
+	static final String PURPOSE_EXTRA = "whatfor";
 
 	/*
 	 * Assuming activation request by default. This happens to match the default
@@ -81,6 +84,8 @@ public class ActivationActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mContext = this;
 		setContentView(R.layout.activity_activation);
+		
+		todo = getIntent().getIntExtra(PURPOSE_EXTRA, TODO_ACTIVATE );
 
 		TextView label = (TextView) findViewById(R.id.enter_pin_label);
 		label.setTextColor(MainScreenActivity.color);
@@ -90,12 +95,10 @@ public class ActivationActivity extends Activity {
 		// Handle legacy intent as well as GSMA standard type intent
 		if (nfcaction != null) {
 			if (nfcaction.equals(PaymentConstants.TRANSACTION_EVENT_LEGACY)) {
-				todo = TODO_VERIFY;
 				updateUI(this.getIntent().getByteArrayExtra(
 						PaymentConstants.TRANSACTION_EVENT_EXTRA_DATA_LEGACY));
 			} else if (nfcaction
 					.equals(PaymentConstants.TRANSACTION_EVENT_GSMA)) {
-				todo = TODO_VERIFY;
 				updateUI(this.getIntent().getByteArrayExtra(
 						PaymentConstants.TRANSACTION_EVENT_EXTRA_DATA_GSMA));
 			}
@@ -123,12 +126,16 @@ public class ActivationActivity extends Activity {
 								makeToast("Tap again");
 								break;
 							case TODO_ACTIVATE:
+								MainScreenActivity.automatic=false;
 								response = mUICC.activate(
 										MainScreenActivity.AID, v.getText()
 												.toString());
 								
 								if ( response[0] == (byte)0x90 && response[1]==(byte)0 ){
 									makeToast("Activated");
+									MainScreenActivity.automatic=true;
+								}else{
+									makeToast("Activation failed");
 								}
 								break;
 							}
@@ -164,9 +171,7 @@ public class ActivationActivity extends Activity {
 	}
 
 	private void updateUI(byte[] payload) {
-
 		if (payload.length == 2) {
-
 			// push is caused by second TAP
 			todo = TODO_CONFIRM;
 
@@ -195,9 +200,7 @@ public class ActivationActivity extends Activity {
 				tv.setText("Payment not authorised");
 			}
 		} else {
-
 			// push is caused by first TAP
-
 			todo = TODO_VERIFY;
 
 			TextView amountTv = (TextView) findViewById(R.id.enter_pin_label);
@@ -229,11 +232,15 @@ public class ActivationActivity extends Activity {
 	/*
 	 * Static method to kickstart the activity
 	 */
-	static void kick(Context ctx) {
+	static void kick(Context ctx, int purpose) {
 		Intent intnt = new Intent();
 		intnt.setClass(ctx, ActivationActivity.class);
+		intnt.putExtra(PURPOSE_EXTRA, purpose);
 		intnt.setFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
 		ctx.startActivity(intnt);
-
+	}
+	
+	static void kick(Context ctx) {
+		kick(ctx, TODO_ACTIVATE);
 	}
 }

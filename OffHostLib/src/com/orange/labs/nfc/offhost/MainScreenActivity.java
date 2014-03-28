@@ -124,7 +124,7 @@ public abstract class MainScreenActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				setDefaultPaymentSetting();
-				ActivationActivity.kick(mContext);
+				ActivationActivity.kick(mContext, ActivationActivity.TODO_PAY_NOW);
 			}
 		});
 
@@ -136,17 +136,14 @@ public abstract class MainScreenActivity extends Activity {
 			@Override
 			public void onClick(View view) {
 				CheckBox cb = (CheckBox) view;
-				Util.myLog("Check " + cb.isChecked());
+				Util.myLog("Automatic " + (cb.isChecked()?"checked":"unchecked"));
 
-				automatic = cb.isChecked();
-				// TODO : save this to file system
-
-				if (automatic) {
+				if (cb.isChecked()) {
 					/*
 					 * start PIN entry screen. If PIN matches then activate UICC
 					 * payment instance.
 					 */
-					ActivationActivity.kick(mContext);
+					ActivationActivity.kick(mContext, ActivationActivity.TODO_ACTIVATE);
 				}
 				if (payNowButton != null) {
 					payNowButton.setVisibility((cb.isChecked() ? View.INVISIBLE
@@ -201,6 +198,11 @@ public abstract class MainScreenActivity extends Activity {
 
 		CheckBox cb = (CheckBox) findViewById(R.id.automatic);
 		cb.setChecked(automatic);
+		
+		if (payNowButton != null) {
+			payNowButton.setVisibility((cb.isChecked() ? View.INVISIBLE
+					: View.VISIBLE));
+		}
 
 		TextView wl = (TextView) findViewById(R.id.warning_label);
 		// TODO : use resource text string instead
