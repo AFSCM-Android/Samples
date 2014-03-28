@@ -2,6 +2,7 @@ package com.orange.labs.nfc.offhost;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -36,7 +37,6 @@ public class UICC implements CallBack {
 	public UICC(Context ctx) {
 		try {
 			synchronized (mLock) {
-				Util.myLog("lock");
 				mLock.lock();
 				scardManager = new SEService(ctx, this);
 			}
@@ -55,63 +55,62 @@ public class UICC implements CallBack {
 		Channel c = null;
 		byte[] ret = null;
 
-		Util.myLog("before sync");
 		synchronized (mLock) {
-			// try {
-			mLock.tryLock();
-			Util.myLog("after sync");
+			try {
+				if (mLock.tryLock(1000, TimeUnit.SECONDS)) {
 
-			if (isConnected) {
+					if (isConnected) {
 
-				// TODO : look for UICC in the reader list
-				uicc = (scardManager.getReaders())[0];
-				Util.myLog("Connected to " + uicc.getName());
+						// TODO : look for UICC in the reader list
+						uicc = (scardManager.getReaders())[0];
+						Util.myLog("Connected to " + uicc.getName());
 
-				if (uicc.isSecureElementPresent() == false) {
-					throw new cardNotPresentException();
-				}
-
-				try {
-					s = uicc.openSession();
-					Util.myLog("[AID] " + Util.bytesToHex(aid));
-
-					try {
-						c = s.openLogicalChannel(aid);
-						Util.myLog("[SELECT] OK");
-						Util.myLog("APDU : " + Util.bytesToHex(capdu));
-
-						ret = c.transmit(capdu);
-						Util.myLog("<= " + Util.bytesToHex(ret));
-
-					} catch (SecurityException e1) {
-						throw new accessDeniedException();
-					} catch (NoSuchElementException e) {
-						throw e;
-					} catch (Exception e1) {
-						Util.myLog("[" + e1.getClass().getName() + "]\n\t"
-								+ e1.getMessage());
-					} finally {
-						if (c != null) {
-							Util.myLog("Closing channel");
-							c.close();
+						if (uicc.isSecureElementPresent() == false) {
+							throw new cardNotPresentException();
 						}
-					}
-				} catch (IOException e2) {
-					Util.myLog("[SESSION] KO \n" + e2.getClass().getName()
-							+ "]\n\t" + e2.getMessage());
-				} finally {
-					if (s != null) {
-						Util.myLog("Closing session");
-						s.close();
+
+						try {
+							s = uicc.openSession();
+							Util.myLog("[AID] " + Util.bytesToHex(aid));
+
+							try {
+								c = s.openLogicalChannel(aid);
+								Util.myLog("[SELECT] OK");
+								Util.myLog("APDU : " + Util.bytesToHex(capdu));
+
+								ret = c.transmit(capdu);
+								Util.myLog("<= " + Util.bytesToHex(ret));
+
+							} catch (SecurityException e1) {
+								throw new accessDeniedException();
+							} catch (NoSuchElementException e) {
+								throw e;
+							} catch (Exception e1) {
+								Util.myLog("[" + e1.getClass().getName()
+										+ "]\n\t" + e1.getMessage());
+							} finally {
+								if (c != null) {
+									Util.myLog("Closing channel");
+									c.close();
+								}
+							}
+						} catch (IOException e2) {
+							Util.myLog("[SESSION] KO \n"
+									+ e2.getClass().getName() + "]\n\t"
+									+ e2.getMessage());
+						} finally {
+							if (s != null) {
+								Util.myLog("Closing session");
+								s.close();
+							}
+						}
+					} else {
+						Util.myLog("Service not connected");
 					}
 				}
-			} else {
-				Util.myLog("Service not connected");
+			} catch (InterruptedException e) {
+				Util.myLog("Interrupted !");
 			}
-
-			// } catch (InterruptedException e) {
-			// Util.myLog("Interrupted !");
-			// }
 		}
 
 		return ret;
@@ -126,7 +125,6 @@ public class UICC implements CallBack {
 		try {
 			if (service.isConnected()) {
 				isConnected = true;
-				Util.myLog("unlock");
 				mLock.unlock();
 				Reader[] scardReaders = scardManager.getReaders();
 				if (scardReaders != null) {
@@ -185,11 +183,13 @@ public class UICC implements CallBack {
 			response = sendAPDU(aid, get_status_APDU, "Get Status");
 			if (response[0] == (byte) 0x01 && response[1] == (byte) 0x90
 					&& response[2] == (byte) 0x00) {
+				Util.myLog("cardlet is active");
 				return true;
 			}
 		} catch (Exception e) {
 			Util.myLog("Exception ! " + e);
 		}
+		Util.myLog("cardlet is not active");
 		return false;
 	}
 }

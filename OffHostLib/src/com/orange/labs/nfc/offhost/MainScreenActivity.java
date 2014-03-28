@@ -40,7 +40,7 @@ import android.widget.TextView;
 
 public abstract class MainScreenActivity extends Activity {
 	private static MainScreenActivity mContext;
-	public static boolean automatic = false;
+	public static volatile boolean automatic = false;
 	public static View payNowButton = null;
 	public static String serviceName = "";
 	public static int color = 0;
@@ -175,7 +175,7 @@ public abstract class MainScreenActivity extends Activity {
 					.forName("org.simalliance.openmobileapi.Reader");
 
 			mUICC = new UICC(this);
-			new GetStatusTask().execute(this);
+			(new GetStatusTask()).start();
 
 		} catch (ClassNotFoundException e) {
 			// Class not found!
@@ -186,10 +186,10 @@ public abstract class MainScreenActivity extends Activity {
 		}
 	}
 
-	class GetStatusTask extends AsyncTask<MainScreenActivity, Integer, Long> {
-		protected Long doInBackground(MainScreenActivity... a) {
-			a[0].automatic = a[0].mUICC.isActive(AID);
-			return null;
+	private class GetStatusTask extends Thread {
+		@Override
+		public void run() {
+			automatic = mUICC.isActive(AID);
 		}
 	}
 
