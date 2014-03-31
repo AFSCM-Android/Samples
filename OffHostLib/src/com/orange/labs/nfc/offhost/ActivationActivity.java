@@ -215,7 +215,7 @@ public class ActivationActivity extends Activity {
 						}
 					}
 					handled = true;
-					if (todo != TODO_PAY_NOW)
+					if (todo != TODO_PAY_NOW  && todo != TODO_VERIFY)
 						finish();
 				}
 				return handled;
