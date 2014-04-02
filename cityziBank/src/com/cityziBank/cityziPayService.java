@@ -32,7 +32,7 @@ public class cityziPayService extends OrangeOffHostApduService {
 	@Override
 	public void onCreate() {
 		Util.setTag("CityziPay");
-		// TODO Auto-generated method stub
 		super.onCreate();
+		super.setAID(cityziPayUI.mAID);
 	}
 }

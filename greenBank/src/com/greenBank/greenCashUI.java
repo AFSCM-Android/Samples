@@ -23,7 +23,6 @@
  * ${Log}
  *
  */
-
 package com.greenBank;
 
 import android.os.Bundle;
@@ -33,7 +32,7 @@ import com.orange.labs.nfc.offhost.Util;
 
 public class greenCashUI extends MainScreenActivity {
 
-	static final byte[] mAID = { (byte)0x4E, (byte)0x46, (byte)0x43, (byte)0x54, (byte)0x65, (byte)0x73, (byte)0x74, (byte)0x65, (byte)0x72, (byte)0x45, (byte)0x54, (byte)0x53, (byte)0x49, (byte)0x31, (byte)0x2E, (byte)0x32  };
+	static final byte[] mAID = {  (byte)0xA0, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x04, (byte)0x10, (byte)0x10, (byte)0x12};
 
     public String getAssociatedService(){
 		return greenCashService.class.getCanonicalName();	
@@ -42,7 +41,7 @@ public class greenCashUI extends MainScreenActivity {
 	@Override
 	public void onCreate(Bundle b) {
 		Util.setTag("GreenCash");
-		setAID(mAID);
+		setAID(mAID); // Must be called before the super class 
 		super.onCreate(b);
 		setServiceName("Green Cash", 0xEF44BB22);
 	}

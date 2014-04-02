@@ -29,6 +29,7 @@ import android.annotation.TargetApi;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.nfc.NfcAdapter;
@@ -38,6 +39,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.Message;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -46,6 +48,8 @@ public class OrangeOffHostApduService extends OffHostApduService {
 	static boolean bootcomplete = false;
 	static String mServiceName;
 	static Context mContext;
+	private UICC mUICC;
+	private byte[] mAID;
 
 	@TargetApi(19)
 	@Override
@@ -53,6 +57,14 @@ public class OrangeOffHostApduService extends OffHostApduService {
 		Util.myLog("Bound");
 
 		return null;
+	}
+	
+	/* Simple function to set target AID */
+	public void setAID(byte[] aid_array) {
+		SharedPreferences settings = getSharedPreferences(MainScreenActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("AID", Util.bytesToHex(aid_array) );
+        editor.commit();
 	}
 
 	public void onCreate() {
@@ -65,7 +77,6 @@ public class OrangeOffHostApduService extends OffHostApduService {
 		try {
 			// Settings.Secure.NFC_PAYMENT_DEFAULT_COMPONENT not currently in
 			// SDK
-
 			paymentSettingUri = Settings.Secure
 					.getUriFor((String) (Settings.Secure.class
 							.getField("NFC_PAYMENT_DEFAULT_COMPONENT")
@@ -110,10 +121,14 @@ public class OrangeOffHostApduService extends OffHostApduService {
 					// TODO : read service status in UICC
 					// If service is not enabled in the UICC, and if automatic mode
 					// then start PIN entry UI.
-					if (MainScreenActivity.automatic){
-						// if ( UICC_status_inactive )
-						ActivationActivity.kick(mContext);
-					    // }
+					SharedPreferences myPrefs = getSharedPreferences(MainScreenActivity.PREFS_NAME, 0);
+	                Boolean isAuto = myPrefs.getBoolean("automatic", false);
+	                
+	                if (isAuto) {
+	                	mAID = Util.hexToBytes(myPrefs.getString("AID", "00"));
+	                	
+	                	mUICC = new UICC(mContext);
+	                	(new CheckActivationTask()).start();
 					}
 				}
 			} else {
@@ -123,4 +138,12 @@ public class OrangeOffHostApduService extends OffHostApduService {
 		}
 	}
 
+	private class CheckActivationTask extends Thread {
+		@Override
+		public void run() {
+			if (! mUICC.isActive(mAID)){
+				ActivationActivity.kick(mContext);
+			}
+		}
+	}
 }

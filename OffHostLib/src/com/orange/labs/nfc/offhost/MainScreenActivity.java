@@ -27,19 +27,15 @@ package com.orange.labs.nfc.offhost;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.nfc.NfcAdapter;
 import android.nfc.cardemulation.CardEmulation;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
-import android.os.Vibrator;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -52,6 +48,7 @@ public abstract class MainScreenActivity extends Activity {
 	public static int color = 0;
 	protected static byte[] AID = null;
 	public UICC mUICC;
+	public static final String PREFS_NAME = "OrangeNfcConfig";
 	
 	private Handler uiHandler = new UIHandler();
 
@@ -155,6 +152,15 @@ public abstract class MainScreenActivity extends Activity {
 				CheckBox cb = (CheckBox) view;
 				Util.myLog("Automatic "
 						+ (cb.isChecked() ? "checked" : "unchecked"));
+				
+				/*
+				 * Save user preference into setting
+				 */
+				SharedPreferences settings = getSharedPreferences(MainScreenActivity.PREFS_NAME, 0);
+                SharedPreferences.Editor editor = settings.edit();
+                editor.putBoolean("automatic", cb.isChecked() );
+                editor.commit();
+
 
 				if (cb.isChecked()) {
 					/*
@@ -284,6 +290,11 @@ public abstract class MainScreenActivity extends Activity {
 	/* Simple function to set target AID */
 	public void setAID(byte[] aid_array) {
 		AID = aid_array;
+		
+		SharedPreferences settings = getSharedPreferences(MainScreenActivity.PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putString("AID", Util.bytesToHex(aid_array) );
+        editor.commit();
 	}
 
 	@Override

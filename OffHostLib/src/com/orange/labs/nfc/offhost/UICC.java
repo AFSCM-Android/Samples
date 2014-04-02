@@ -38,6 +38,7 @@ public class UICC implements CallBack {
 		try {
 			synchronized (mLock) {
 				mLock.lock();
+				Util.myLog("UICC after lock");
 				scardManager = new SEService(ctx, this);
 			}
 		} catch (SecurityException e) {
@@ -57,11 +58,15 @@ public class UICC implements CallBack {
 
 		synchronized (mLock) {
 			try {
+				Util.myLog("before tryLock");
 				if (mLock.tryLock(1000, TimeUnit.SECONDS)) {
+					Util.myLog("after tryLock");
 
 					if (isConnected) {
 
 						mLock.unlock();
+						Util.myLog("sendAPDU after unlock");
+
 						
 						// TODO : look for UICC in the reader list
 						uicc = (scardManager.getReaders())[0];

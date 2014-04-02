@@ -47,7 +47,7 @@
                     android:scheme="nfc"
                     android:host="secure"
                     android:port="0"
-                    android:path="/4e464354657374657245545349312e32"/> 
+                    android:path="/a000000004101012"/> 
             </intent-filter>
             <intent-filter>
                 <action android:name="com.gsma.services.nfc.action.TRANSACTION_EVENT" />
@@ -56,7 +56,7 @@
 
                 <data
                     android:host="secure"
-                    android:pathPattern="/SIM.*/4e464354657374657245545349312e32"
+                    android:pathPattern="/SIM.*/a000000004101012"
                     android:scheme="nfc" />
             </intent-filter>
         </activity>
