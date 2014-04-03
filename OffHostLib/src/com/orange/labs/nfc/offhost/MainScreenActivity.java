@@ -247,6 +247,7 @@ public abstract class MainScreenActivity extends Activity {
 	 */
 	protected void onResume() {
 		super.onResume();
+		(new GetStatusTask()).start();
 		
 		refreshUI();
 	}

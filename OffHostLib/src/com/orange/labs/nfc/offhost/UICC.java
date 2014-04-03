@@ -58,18 +58,24 @@ public class UICC implements CallBack {
 
 		synchronized (mLock) {
 			try {
-				Util.myLog("before tryLock");
 				if (mLock.tryLock(1000, TimeUnit.SECONDS)) {
-					Util.myLog("after tryLock");
 
 					if (isConnected) {
 
 						mLock.unlock();
-						Util.myLog("sendAPDU after unlock");
-
 						
-						// TODO : look for UICC in the reader list
-						uicc = (scardManager.getReaders())[0];
+						Reader[] readers = scardManager.getReaders();
+						for (int i = 0 ; i < readers.length ; i++){
+							if (readers[i].getName().contains("SIM")){
+								uicc = readers[i];
+								break;
+							}
+						}
+						
+						if (uicc == null){
+							throw new cardNotPresentException();
+						}
+						
 						Util.myLog("Connected to " + uicc.getName());
 
 						if (uicc.isSecureElementPresent() == false) {
@@ -153,6 +159,7 @@ public class UICC implements CallBack {
 	}
 
 	public void dispose() {
+		scardManager.shutdown();
 		scardManager = null;
 		isConnected = false;
 	}
