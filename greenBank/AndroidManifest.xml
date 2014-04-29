@@ -16,8 +16,7 @@
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:label="@string/app_name">
         <uses-library
             android:name="org.simalliance.openmobileapi"
             android:required="false" />
@@ -25,8 +24,7 @@
         <activity
             android:name=".greenCashUI"
             android:configChanges="orientation|keyboardHidden|screenSize"
-            android:label="@string/app_name"
-            android:theme="@style/FullscreenTheme" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +36,6 @@
             android:configChanges="orientation|screenSize"
             android:label="@string/app_name"
             android:launchMode="singleTop"
-            android:theme="@style/AppBaseTheme"
             android:windowSoftInputMode="stateUnspecified" >
             <intent-filter>
                 <action android:name="android.nfc.action.TRANSACTION_DETECTED"/>

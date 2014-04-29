@@ -70,6 +70,7 @@ public abstract class MainScreenActivity extends Activity {
 	 * Find out if current application is selected as default payment in the
 	 * tap&pay menu
 	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	boolean isRouted() {
 		/*
 		 * Query NFC adapter to see if current application is the default
@@ -179,6 +180,13 @@ public abstract class MainScreenActivity extends Activity {
 			}
 		});
 
+		serviceName = getResources().getString(R.string.service_name);
+		color = getResources().getColor(R.color.service_color);
+		TextView title = (TextView) findViewById(R.id.servicename);
+		title.setTextColor(color);
+		title.setText(serviceName);
+		
+		
 		/*
 		 * Some code here is written in order to ignore notification of tap&pay
 		 * change received at every boot by the currently selected application.
@@ -198,7 +206,7 @@ public abstract class MainScreenActivity extends Activity {
 			Class classToInvestigate = Class
 					.forName("org.simalliance.openmobileapi.Reader");
 
-			mUICC = new UICC(this);
+			mUICC = new UICC(this, getResources().getString(R.string.AID));
 			(new GetStatusTask()).start();
 
 		} catch (ClassNotFoundException e) {
@@ -213,7 +221,7 @@ public abstract class MainScreenActivity extends Activity {
 	private class GetStatusTask extends Thread {
 		@Override
 		public void run() {
-			automatic = mUICC.isActive(AID);
+			automatic = mUICC.isActive();
 			
 			// Notify UI thread for update
 			Message msg = Message.obtain(uiHandler);
@@ -227,7 +235,7 @@ public abstract class MainScreenActivity extends Activity {
 		public void run() {
 			
 			try {
-				mUICC.deActivate(AID);
+				mUICC.deActivate();
 				automatic = false;
 				} catch (Exception e) {
 				Util.myLog("Error trying to deactivate : " + e);
@@ -277,25 +285,6 @@ public abstract class MainScreenActivity extends Activity {
 		// TODO : use resource text string instead
 		wl.setText(serviceName
 				.concat(" is not currently set as your default payment application"));
-	}
-
-	/* Simple function to customise UI */
-	public void setServiceName(String sn, int cv) {
-		serviceName = sn;
-		color = cv;
-		TextView title = (TextView) findViewById(R.id.servicename);
-		title.setTextColor(cv);
-		title.setText(sn);
-	}
-
-	/* Simple function to set target AID */
-	public void setAID(byte[] aid_array) {
-		AID = aid_array;
-		
-		SharedPreferences settings = getSharedPreferences(MainScreenActivity.PREFS_NAME, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.putString("AID", Util.bytesToHex(aid_array) );
-        editor.commit();
 	}
 
 	@Override

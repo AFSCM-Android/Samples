@@ -31,8 +31,6 @@ import com.orange.labs.nfc.offhost.Util;
 
 public class yellowCashUI extends MainScreenActivity {
 
-	static final byte[] mAID = {  (byte)0xA0, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x04, (byte)0x10, (byte)0x10, (byte)0x13};
-
 	public String getAssociatedService() {
 		return yellowCashService.class.getCanonicalName();
 	}
@@ -40,8 +38,6 @@ public class yellowCashUI extends MainScreenActivity {
 	@Override
 	public void onCreate(Bundle b) {
 		Util.setTag("YellowCash");
-		setAID(mAID);  // Must be called before the super class 
 		super.onCreate(b);
-		setServiceName("Yellow Cash", 0xEFEEDD22);
 	}
 }

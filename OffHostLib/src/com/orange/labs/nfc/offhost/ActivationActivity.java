@@ -97,7 +97,7 @@ public class ActivationActivity extends Activity {
 			} else {
 				if (todo == TODO_PAY_NOW) {
 					try {
-						mUICC.deActivate(MainScreenActivity.AID);
+						mUICC.deActivate();
 						finish();
 					} catch (Exception e) {
 						Util.myLog("Deactivation failed for some reason");
@@ -122,7 +122,7 @@ public class ActivationActivity extends Activity {
 			}
 			
 			try {
-				mUICC.deActivate(MainScreenActivity.AID);
+				mUICC.deActivate();
 			} catch (Exception e){
 				Util.myLog("Deactivation failed for some reason.");
 			}
@@ -166,8 +166,7 @@ public class ActivationActivity extends Activity {
 
 							switch (todo) {
 							case TODO_VERIFY:
-								response = mUICC.verifyPIN(
-										MainScreenActivity.AID, v.getText()
+								response = mUICC.verifyPIN( v.getText()
 												.toString());
 								// Assuming PIN is correct from here (otherwise
 								// exception)
@@ -175,8 +174,7 @@ public class ActivationActivity extends Activity {
 								break;
 							case TODO_ACTIVATE:
 								MainScreenActivity.automatic = false;
-								response = mUICC.activate(
-										MainScreenActivity.AID, v.getText()
+								response = mUICC.activate( v.getText()
 												.toString());
 
 								if (response[0] == (byte) 0x90
@@ -188,8 +186,7 @@ public class ActivationActivity extends Activity {
 								}
 								break;
 							case TODO_PAY_NOW:
-								response = mUICC.activate(
-										MainScreenActivity.AID, v.getText()
+								response = mUICC.activate( v.getText()
 												.toString());
 
 								if ( ( response[0] == (byte) 0x90
@@ -223,11 +220,13 @@ public class ActivationActivity extends Activity {
 		});
 
 		try {
+			// Detect devices not supporting the API with this call...
 			Class classToInvestigate = Class
 					.forName("org.simalliance.openmobileapi.Reader");
-			mUICC = new UICC(this);
+			mUICC = new UICC(this, getResources().getString(R.string.AID));
+			// TODO : define AID
 		} catch (ClassNotFoundException e) {
-			// Class not found!
+			// ... and treat appropriately 
 			Util.myLog("UICC access not supported on this device" + e);
 		} catch (Exception e) {
 			// Unknown exception

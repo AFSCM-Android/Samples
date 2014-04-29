@@ -33,8 +33,10 @@ public class UICC implements CallBack {
 	public SEService scardManager;
 	private Lock mLock = new ReentrantLock();
 	public volatile boolean isConnected = false;
+	private byte[] aid;
 
-	public UICC(Context ctx) {
+	public UICC(Context ctx, String AID) {
+		aid = Util.hexToBytes(AID);
 		try {
 			synchronized (mLock) {
 				mLock.lock();
@@ -48,7 +50,7 @@ public class UICC implements CallBack {
 		}
 	}
 
-	public byte[] sendAPDU(byte aid[], byte[] capdu, String label)
+	public byte[] sendAPDU(byte[] capdu, String label)
 			throws cardNotPresentException, accessDeniedException,
 			NoSuchElementException {
 		Reader uicc = null;
@@ -164,37 +166,37 @@ public class UICC implements CallBack {
 		isConnected = false;
 	}
 
-	public byte[] verifyPIN(byte[] aid, String pinValue)
+	public byte[] verifyPIN(String pinValue)
 			throws cardNotPresentException, accessDeniedException,
 			NoSuchElementException, WrongPinException {
 		byte[] tmpPIN = verifyPIN_APDU;
 		System.arraycopy(pinValue.getBytes(), 0, tmpPIN, 5,
 				pinValue.getBytes().length);
 
-		byte[] rapdu = sendAPDU(aid, tmpPIN, "Verify PIN");
+		byte[] rapdu = sendAPDU(tmpPIN, "Verify PIN");
 		if (rapdu[0] != (byte) 0x90 || rapdu[1] != (byte) 0) {
 			throw new WrongPinException();
 		}
 		return rapdu;
 	}
 
-	public byte[] activate(byte[] aid, String pinValue)
+	public byte[] activate(String pinValue)
 			throws cardNotPresentException, accessDeniedException,
 			NoSuchElementException, WrongPinException {
-		verifyPIN(aid, pinValue);
-		return sendAPDU(aid, activate_APDU, "Activate");
+		verifyPIN(pinValue);
+		return sendAPDU(activate_APDU, "Activate");
 	}
 
-	public byte[] deActivate(byte[] aid) throws cardNotPresentException,
+	public byte[] deActivate() throws cardNotPresentException,
 			accessDeniedException, NoSuchElementException {
-		return sendAPDU(aid, deactivate_APDU, "Deactivate");
+		return sendAPDU(deactivate_APDU, "Deactivate");
 	}
 
-	public boolean isActive(byte[] aid) {
+	public boolean isActive() {
 		byte[] response;
 
 		try {
-			response = sendAPDU(aid, get_status_APDU, "Get Status");
+			response = sendAPDU(get_status_APDU, "Get Status");
 			if (response[0] == (byte) 0x01 && response[1] == (byte) 0x90
 					&& response[2] == (byte) 0x00) {
 				Util.myLog("cardlet is active");

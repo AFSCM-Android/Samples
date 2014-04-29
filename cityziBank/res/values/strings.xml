@@ -3,7 +3,7 @@
 
     <string name="app_name">Cityzi Bank</string>
     <string name="service_name">Cityzi Pay</string>
-    
+    <string name="AID">a000000004101011</string>  <!-- Overrides library -->
 
     
 </resources>

@@ -32,8 +32,6 @@ import com.orange.labs.nfc.offhost.Util;
 
 public class cityziPayUI extends MainScreenActivity {
 
-	static final byte[] mAID = {  (byte)0xA0, (byte)0x00, (byte)0x00, (byte)0x00, (byte)0x04, (byte)0x10, (byte)0x10, (byte)0x11};
-
 	public String getAssociatedService(){
 		return cityziPayService.class.getCanonicalName();	
 	}
@@ -41,9 +39,6 @@ public class cityziPayUI extends MainScreenActivity {
 	@Override
 	public void onCreate(Bundle b) {
 		Util.setTag("CityziPay");
-        setAID(mAID); // Must be called before the super class 
         super.onCreate(b);
-		setServiceName("Cityzi Pay", 0xEF999999);
-
 	}
 }

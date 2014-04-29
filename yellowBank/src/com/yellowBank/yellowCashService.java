@@ -33,6 +33,5 @@ public class yellowCashService extends OrangeOffHostApduService {
 	public void onCreate() {
 		Util.setTag("YellowCash");
 		super.onCreate();
-		super.setAID(yellowCashUI.mAID);
 	}
 }

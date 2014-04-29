@@ -3,6 +3,6 @@
 
     <string name="app_name">Green Bank</string>
     <string name="service_name">Green Cash</string>
- 
-    
+    <string name="AID">a000000004101012</string>    <!-- Overrides library -->
+
 </resources>

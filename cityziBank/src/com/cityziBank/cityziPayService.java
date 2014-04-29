@@ -33,6 +33,5 @@ public class cityziPayService extends OrangeOffHostApduService {
 	public void onCreate() {
 		Util.setTag("CityziPay");
 		super.onCreate();
-		super.setAID(cityziPayUI.mAID);
 	}
 }

@@ -3,6 +3,6 @@
 
     <string name="app_name">Yellow Bank</string>
     <string name="service_name">Yellow Cash</string>
-    
+    <string name="AID">a000000004101013</string>  <!-- Overrides library -->
     
 </resources>

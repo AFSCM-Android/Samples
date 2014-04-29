@@ -33,6 +33,5 @@ public class greenCashService extends OrangeOffHostApduService {
 	public void onCreate() {
 		Util.setTag("GreenCash");
 		super.onCreate();
-		super.setAID(greenCashUI.mAID);
 	}
 }
