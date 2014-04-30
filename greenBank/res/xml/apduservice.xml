@@ -3,6 +3,6 @@
            android:apduServiceBanner="@drawable/greencash">
     <aid-group android:description="@string/service_name" android:category="payment">
  		<aid-filter android:name="325041592E5359532E4444463031"/> <!--  PPSE -->
- 		<aid-filter android:name="4E4643546573746572455654312E31"/> <!--  NFC Tester 1  -->
+ 		<aid-filter android:name="A000000004101012"/> <!--  NFC Tester 2  -->
     </aid-group>
 </offhost-apdu-service>
