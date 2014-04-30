@@ -49,14 +49,14 @@ public abstract class MainScreenActivity extends Activity {
 	protected static byte[] AID = null;
 	public UICC mUICC;
 	public static final String PREFS_NAME = "OrangeNfcConfig";
-	
+
 	private Handler uiHandler = new UIHandler();
 
 	class UIHandler extends Handler {
-	    @Override
-	    public void handleMessage(Message msg) {
-	        refreshUI();
-	    }
+		@Override
+		public void handleMessage(Message msg) {
+			refreshUI();
+		}
 	}
 
 	/*
@@ -153,15 +153,15 @@ public abstract class MainScreenActivity extends Activity {
 				CheckBox cb = (CheckBox) view;
 				Util.myLog("Automatic "
 						+ (cb.isChecked() ? "checked" : "unchecked"));
-				
+
 				/*
 				 * Save user preference into setting
 				 */
-				SharedPreferences settings = getSharedPreferences(MainScreenActivity.PREFS_NAME, 0);
-                SharedPreferences.Editor editor = settings.edit();
-                editor.putBoolean("automatic", cb.isChecked() );
-                editor.commit();
-
+				SharedPreferences settings = getSharedPreferences(
+						MainScreenActivity.PREFS_NAME, 0);
+				SharedPreferences.Editor editor = settings.edit();
+				editor.putBoolean("automatic", cb.isChecked());
+				editor.commit();
 
 				if (cb.isChecked()) {
 					/*
@@ -185,8 +185,7 @@ public abstract class MainScreenActivity extends Activity {
 		TextView title = (TextView) findViewById(R.id.servicename);
 		title.setTextColor(color);
 		title.setText(serviceName);
-		
-		
+
 		/*
 		 * Some code here is written in order to ignore notification of tap&pay
 		 * change received at every boot by the currently selected application.
@@ -199,8 +198,6 @@ public abstract class MainScreenActivity extends Activity {
 		 * UICC management : create a UICC object, and lauch a thread to read
 		 * current cardlet activation status.
 		 */
-		
-		
 
 		try {
 			Class classToInvestigate = Class
@@ -221,30 +218,38 @@ public abstract class MainScreenActivity extends Activity {
 	private class GetStatusTask extends Thread {
 		@Override
 		public void run() {
-			automatic = mUICC.isActive();
-			
-			// Notify UI thread for update
-			Message msg = Message.obtain(uiHandler);
-            msg.obj = "update";
-            uiHandler.sendMessage(msg);
+			try {
+				Class classToInvestigate = Class
+						.forName("org.simalliance.openmobileapi.Reader");
+				
+				automatic = mUICC.isActive();
+
+				// Notify UI thread for update
+				Message msg = Message.obtain(uiHandler);
+				msg.obj = "update";
+				uiHandler.sendMessage(msg);
+			} catch (ClassNotFoundException e) {
+				// Class not found!
+				Util.myLog("UICC access not supported on this device" + e);
+			}
 		}
 	}
-	
+
 	private class deactivateTask extends Thread {
 		@Override
 		public void run() {
-			
+
 			try {
 				mUICC.deActivate();
 				automatic = false;
-				} catch (Exception e) {
+			} catch (Exception e) {
 				Util.myLog("Error trying to deactivate : " + e);
 			}
-			
+
 			// Notify UI thread for update
 			Message msg = Message.obtain(uiHandler);
-            msg.obj = "update";
-            uiHandler.sendMessage(msg);
+			msg.obj = "update";
+			uiHandler.sendMessage(msg);
 		}
 	}
 
@@ -256,11 +261,11 @@ public abstract class MainScreenActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		(new GetStatusTask()).start();
-		
+
 		refreshUI();
 	}
-	
-	void refreshUI(){
+
+	void refreshUI() {
 
 		View mLL = findViewById(R.id.warning_box);
 		View pC = findViewById(R.id.payment_control);

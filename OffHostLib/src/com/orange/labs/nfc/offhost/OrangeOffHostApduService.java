@@ -49,7 +49,7 @@ public class OrangeOffHostApduService extends OffHostApduService {
 	static String mServiceName;
 	static Context mContext;
 	private UICC mUICC;
-	
+
 	@TargetApi(19)
 	@Override
 	public IBinder onBind(Intent arg0) {
@@ -104,12 +104,13 @@ public class OrangeOffHostApduService extends OffHostApduService {
 
 				Util.myLog("Setting change");
 
-				/* String componentString = Settings.Secure.getString(
-						mContext.getContentResolver(),
-						// Settings.Secure.NFC_PAYMENT_DEFAULT_COMPONENT
-						"nfc_payment_default_component"
-						);
-				Util.myLog("Active component is " + componentString);*/
+				/*
+				 * String componentString = Settings.Secure.getString(
+				 * mContext.getContentResolver(), //
+				 * Settings.Secure.NFC_PAYMENT_DEFAULT_COMPONENT
+				 * "nfc_payment_default_component" );
+				 * Util.myLog("Active component is " + componentString);
+				 */
 
 				if (ce.isDefaultServiceForCategory(new ComponentName(mContext,
 						mServiceName), "payment")) {
@@ -124,8 +125,18 @@ public class OrangeOffHostApduService extends OffHostApduService {
 					Boolean isAuto = myPrefs.getBoolean("automatic", false);
 
 					if (isAuto) {
-						mUICC = new UICC(mContext, getResources().getString(R.string.AID));
-						(new CheckActivationTask()).start();
+						try {
+							Class classToInvestigate = Class
+									.forName("org.simalliance.openmobileapi.Reader");
+
+							mUICC = new UICC(mContext, getResources()
+									.getString(R.string.AID));
+							(new CheckActivationTask()).start();
+						} catch (ClassNotFoundException e) {
+							// Class not found!
+							Util.myLog("UICC access not supported on this device"
+									+ e);
+						}
 					}
 				}
 			} else {
