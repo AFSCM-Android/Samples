@@ -14,14 +14,13 @@ Each of the sample applications needs to be built against the OffHostLib.
 This should happen automatically thanks to the project.properties file in 
 each application.
 
-
-This sample code does not cover : 
-- transaction management (capturing event transaction, this has long been documented now)
-- UICC acccess : APDUs to acccess cardlet is not fully built into these samples
+The sample applications rely on instances in the UICC with specific AIDs. 
+The card applications are not available to third parties, however. Therefore, 
+the source code must be edited in order to be used with other card applications
+(mostly changing AID in the manifest and the ressource files).
 
 This code is meant to illustrate how to migrate payment applications from 
 pre-KitKat version to Android 4.4 devices.
-
 
 Binaries
 ========
