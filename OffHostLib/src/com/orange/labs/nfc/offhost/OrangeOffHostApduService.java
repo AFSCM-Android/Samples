@@ -100,8 +100,16 @@ public class OrangeOffHostApduService extends OffHostApduService {
 			if (OrangeOffHostApduService.bootcomplete) {
 
 				NfcAdapter adapter = NfcAdapter.getDefaultAdapter(mContext);
-				CardEmulation ce = CardEmulation.getInstance(adapter);
-
+				
+				CardEmulation ce;
+				try {
+					ce = CardEmulation.getInstance(adapter);
+				} catch (UnsupportedOperationException uoe) {
+					// Device supports tap & pay menu but not CardEmulation !?
+					// This should never happen
+					Util.myLog("Tap&Pay setting change on non-HCE device : WTF ?!");
+					return;
+				}
 				Util.myLog("Setting change");
 
 				/*

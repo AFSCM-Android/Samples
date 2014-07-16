@@ -6,9 +6,9 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="lib" path="C:/Users/pkvk9345/workspace/org.simalliance.openmobileapi.jar"/>
-	<classpathentry kind="lib" path="C:/adt-bundle-windows-x86_64-20130717/sdk/platforms/android-19/android.jar">
+	<classpathentry kind="lib" path="C:/adt-bundle-windows-x86_64-20140624/sdk/platforms/android-19/android.jar">
 		<attributes>
-			<attribute name="javadoc_location" value="file:/C:/adt-bundle-windows-x86_64-20130717/sdk/docs/reference"/>
+			<attribute name="javadoc_location" value="file:/C:/adt-bundle-windows-x86_64-20140624/sdk/docs/reference"/>
 		</attributes>
 		<accessrules>
 			<accessrule kind="nonaccessible" pattern="com/android/internal/**"/>

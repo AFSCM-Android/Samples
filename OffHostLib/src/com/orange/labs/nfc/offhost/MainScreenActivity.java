@@ -78,10 +78,15 @@ public abstract class MainScreenActivity extends Activity {
 		 */
 		NfcAdapter adapter = NfcAdapter.getDefaultAdapter(mContext);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			CardEmulation ce = CardEmulation.getInstance(adapter);
+			try {
+				CardEmulation ce = CardEmulation.getInstance(adapter);
 
-			return (ce.isDefaultServiceForCategory(new ComponentName(mContext,
-					getAssociatedService()), "payment"));
+				return (ce.isDefaultServiceForCategory(new ComponentName(
+						mContext, getAssociatedService()), "payment"));
+			} catch (UnsupportedOperationException uoe) {
+				// Device is Android 4.4 or greater but does not support HCE
+				return (true);
+			}
 		}
 
 		return true; // Assume we are routed on pre-kitkat releases.
@@ -221,7 +226,7 @@ public abstract class MainScreenActivity extends Activity {
 			try {
 				Class classToInvestigate = Class
 						.forName("org.simalliance.openmobileapi.Reader");
-				
+
 				automatic = mUICC.isActive();
 
 				// Notify UI thread for update
